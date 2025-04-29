@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado del Código QR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+
+<div class="container">
+    <h2 class="mb-4">🔍 Estado del Código QR</h2>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>N°:</strong> {{ "%04d"|format(qr.numero_correlativo) }}</p>
+            <p><strong>Código:</strong> {{ qr.codigo }}</p>
+            <p><strong>Estado actual:</strong> 
+                {% if qr.estado == 'pagado' %}
+                    <span class="badge bg-success">Pagado</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Sin pagar</span>
+                {% endif %}
+            </p>
+
+            {% if qr.monto_pagado %}
+                <p><strong>Monto pagado:</strong> S/ {{ "%.2f"|format(qr.monto_pagado) }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="POST" class="mb-3">
+        <div class="mb-3">
+            <label for="estado" class="form-label">Cambiar estado:</label>
+            <select name="estado" id="estado" class="form-select" onchange="toggleMonto()">
+                <option value="sin pagar" {% if qr.estado == 'sin pagar' %}selected{% endif %}>Sin pagar</option>
+                <option value="pagado" {% if qr.estado == 'pagado' %}selected{% endif %}>Pagado</option>
+            </select>
+        </div>
+
+        <div class="mb-3" id="montoField" style="display: none;">
+            <label for="monto" class="form-label">Monto Pagado (S/):</label>
+            <input type="number" class="form-control" name="monto" id="monto" step="0.01" value="{{ qr.monto_pagado or '' }}">
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Guardar</button>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver</a>
+    </form>
+</div>
+
+<script>
+function toggleMonto() {
+    const estado = document.getElementById('estado').value;
+    document.getElementById('montoField').style.display = (estado === 'pagado') ? 'block' : 'none';
+}
+
+window.onload = toggleMonto;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+<h1>QR de {{ cliente.nombre }}</h1>
+<ul>
+    {% for qr in cliente.codigos %}
+    <li>
+        <img src="{{ url_for('static', filename='qr_codes/' + ("%04d"|format(qr.numero_correlativo)) + '.png') }}" width="100"><br>
+        N° {{ "%04d"|format(qr.numero_correlativo) }} - Estado: {{ qr.estado }}<br>
+        Código: {{ qr.codigo }}
+        <a href="{{ url_for('ver_estado', qr_id=qr.id) }}">Ver/Editar</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('index') }}">Volver</a>

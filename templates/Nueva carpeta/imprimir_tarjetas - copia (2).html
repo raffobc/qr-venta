@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Imprimir Tarjetas - {{ cliente.nombre }}</title>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .tarjeta {
+            width: 48%;
+            border: 1px solid #000;
+            padding: 10px;
+            box-sizing: border-box;
+            margin: 1%;
+            float: left;
+            height: 300px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .texto {
+            width: 65%;
+            font-size: 14px;
+            padding-right: 10px;
+        }
+
+        .codigo {
+            width: 35%;
+            text-align: center;
+        }
+
+        .qr-img {
+            width: 100%;
+            height: auto;
+            max-height: 150px;
+            object-fit: contain;
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Tarjetas de {{ cliente.nombre }}</h2>
+
+<div class="container">
+    {% for qr in cliente.codigos %}
+        <div class="tarjeta">
+            <div class="texto">
+                <p><strong>GRAN POLLADA</strong></p>
+                <p>Organiza: Colaboradores de Extinción de Dominio</p>
+                <p>A realizarse el día viernes 28 de mayo</p>
+                <p>Lugar: Comedor Natasha</p>
+                <p><strong>Colaboración: 20 Soles</strong></p>
+                <p>Agradecemos su colaboración</p>
+                <p>Tarjeta aceptada - Tarjeta pagada</p>
+            </div>
+            <div class="codigo">
+                <img src="{{ url_for('static', filename='qr_codes/' + ("%04d"|format(qr.numero_correlativo)) + '.png') }}" class="qr-img">
+                <p><strong>N° {{ "%04d"|format(qr.numero_correlativo) }}</strong></p>
+            </div>
+        </div>
+        {% if loop.index % 6 == 0 %}
+            <div class="page-break"></div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    window.onload = () => window.print();
+</script>
+
+</body>
+</html>

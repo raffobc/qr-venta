@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Escanear QR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+        }
+        .qr-section {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+<div class="container">
+    <h1 class="mb-4">📷 Escanear Código QR</h1>
+
+    <div class="qr-section mb-4">
+        <div id="reader" class="mb-3"></div>
+		<div id="reader-temp" style="display: none;"></div>
+
+
+        <form id="formulario" method="POST" style="display: none;">
+            <input type="hidden" name="codigo" id="codigo">
+        </form>
+
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-primary" onclick="escanearCamara()">📷 Usar Cámara</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">🖼️ Subir Imagen</button>
+            <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="leerImagenQR(event)">
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver al inicio</a>
+    </div>
+</div>
+
+<script>
+let scanner = null;
+
+function escanearCamara() {
+    if (scanner) {
+        scanner.clear();
+    }
+    scanner = new Html5Qrcode("reader");
+    scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+        qrCodeMessage => {
+            document.getElementById('codigo').value = qrCodeMessage;
+            document.getElementById('formulario').submit();
+        },
+        errorMessage => {
+            // silencioso
+        }
+    );
+}
+
+async function leerImagenQR(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const tempReader = new Html5Qrcode("reader-temp");
+    try {
+        const result = await tempReader.scanFile(file, true);
+        if (result) {
+            document.getElementById('codigo').value = result;
+            document.getElementById('formulario').submit();
+        } else {
+            alert("⚠️ No se detectó un código QR en la imagen.");
+        }
+    } catch (error) {
+        alert("⚠️ Error al leer la imagen: " + error.message);
+    } finally {
+        await tempReader.clear();
+        document.getElementById('file-input').value = null;  // Limpia input para reintentos
+    }
+}
+
+// Ejecutar escáner de cámara automáticamente
+window.onload = escanearCamara;
+</script>
+
+
+</body>
+</html>

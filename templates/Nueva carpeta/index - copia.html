@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Clientes</title></head>
+<body>
+<h1>Clientes</h1>
+<ul>
+    {% for cliente in clientes %}
+    <li>
+    {{ cliente.nombre }} –
+    <a href="{{ url_for('ver_cliente', cliente_id=cliente.id) }}">Ver</a> |
+    <a href="{{ url_for('asignar_qr', cliente_id=cliente.id) }}">Asignar QR</a> |
+    <a href="{{ url_for('imprimir_cliente', cliente_id=cliente.id) }}" target="_blank">🖨 Imprimir Tarjetas</a>
+    </li>
+  
+    {% endfor %}
+</ul>
+<a href="{{ url_for('crear_cliente') }}">Crear nuevo cliente</a> | <a href="{{ url_for('escanear') }}">Escanear QR</a> | <a href="{{ url_for('reporte') }}">Reporte</a>
+</body>
+</html>

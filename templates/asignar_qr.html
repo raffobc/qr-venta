@@ -1,0 +1,6 @@
+<h1>Asignar QR a {{ cliente.nombre }}</h1>
+<form method="POST">
+    <input type="number" name="cantidad" min="1" required>
+    <button type="submit">Generar</button>
+</form>
+<a href="{{ url_for('index') }}">Volver</a>

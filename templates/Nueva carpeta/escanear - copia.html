@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Escanear QR</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #reader, #reader__dashboard_section {
+            max-width: 100%;
+        }
+        .opciones {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+
+<h2>📷 Escanear Código QR</h2>
+
+<div id="reader" style="width: 300px;"></div>
+
+<form id="formulario" method="POST" style="display: none;">
+    <input type="hidden" name="codigo" id="codigo">
+</form>
+
+<div class="opciones">
+    <button onclick="escanearCamara()">Usar cámara</button>
+    <button onclick="document.getElementById('file-input').click()">Subir imagen</button>
+    <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="leerImagenQR(event)">
+</div>
+
+<script>
+    let scanner = null;
+
+    function escanearCamara() {
+        if (scanner) {
+            scanner.clear();
+        }
+        scanner = new Html5Qrcode("reader");
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+            qrCodeMessage => {
+                document.getElementById('codigo').value = qrCodeMessage;
+                document.getElementById('formulario').submit();
+            },
+            errorMessage => {
+                // console.log("Escaneo fallido", errorMessage);
+            }
+        );
+    }
+
+    async function leerImagenQR(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const qr = new Html5Qrcode("reader");
+        const result = await qr.scanFile(file, true);
+        if (result) {
+            document.getElementById('codigo').value = result;
+            document.getElementById('formulario').submit();
+        } else {
+            alert("No se detectó un código QR en la imagen.");
+        }
+    }
+
+    // Activar cámara automáticamente si es posible
+    window.onload = escanearCamara;
+</script>
+
+<br><br>
+<a href="{{ url_for('index') }}">⬅ Volver al inicio</a>
+
+</body>
+</html>
