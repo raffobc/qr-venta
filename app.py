@@ -114,6 +114,27 @@ def ver_estado(qr_id):
 
     return render_template('ver_estado.html', qr=qr)
 
+@app.route('/verificar/<numero>')
+def verificar(numero):
+    p = Pollada.query.filter_by(numero=numero).first()
+    if not p:
+        return render_template('ver_estado.html', mensaje="Código no válido ❌", boton=None)
+
+    if p.entregado:
+        return render_template('ver_estado.html', mensaje=f"N° {p.numero} ya fue ENTREGADO ✅", boton=None)
+
+    elif not p.pagado:
+        return render_template('ver_estado.html',
+                               mensaje=f"N° {p.numero} NO está pagado ❌",
+                               boton="Cobrar",
+                               accion=url_for('cobrar', numero=numero))
+
+    else:
+        return render_template('ver_estado.html',
+                               mensaje=f"N° {p.numero} está pagado ✅",
+                               boton="Entregar",
+                               accion=url_for('entregar', numero=numero))
+
 
 @app.route('/imprimir_cliente/<int:cliente_id>')
 def imprimir_cliente(cliente_id):
