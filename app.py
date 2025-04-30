@@ -8,8 +8,6 @@ app = Flask(__name__)
 
 # Configuración de la base de datos usando la variable de entorno
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
-
-# Soluciona advertencia de SQLAlchemy si usas versiones recientes
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicializa SQLAlchemy
@@ -18,7 +16,7 @@ db = SQLAlchemy(app)
 class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
-    codigos = db.relationship('CodigoQR', backref='cliente', lazy=True)
+    codigos = db.relationship('CodigoQR', backref='cliente', lazy=True, cascade="all, delete-orphan")
 
 class CodigoQR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,7 +87,6 @@ def escanear():
             return "Código no encontrado", 404
     return render_template('escanear.html')
 
-
 @app.route('/ver_estado/<int:qr_id>', methods=['GET', 'POST'])
 def ver_estado(qr_id):
     qr = CodigoQR.query.get_or_404(qr_id)
@@ -114,52 +111,10 @@ def ver_estado(qr_id):
 
     return render_template('ver_estado.html', qr=qr)
 
-@app.route('/verificar/<numero>')
-def verificar(numero):
-    p = Pollada.query.filter_by(numero=numero).first()
-    if not p:
-        return render_template('ver_estado.html', mensaje="Código no válido ❌", boton=None)
-
-    if p.entregado:
-        return render_template('ver_estado.html', mensaje=f"N° {p.numero} ya fue ENTREGADO ✅", boton=None)
-
-    elif not p.pagado:
-        return render_template('ver_estado.html',
-                               mensaje=f"N° {p.numero} NO está pagado ❌",
-                               boton="Cobrar",
-                               accion=url_for('cobrar', numero=numero))
-
-    else:
-        return render_template('ver_estado.html',
-                               mensaje=f"N° {p.numero} está pagado ✅",
-                               boton="Entregar",
-                               accion=url_for('entregar', numero=numero))
-
-
 @app.route('/imprimir_cliente/<int:cliente_id>')
 def imprimir_cliente(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template('imprimir_tarjetas.html', cliente=cliente)
-
-
-@app.route('/eliminar_cliente/<int:cliente_id>', methods=['POST'])
-def eliminar_cliente(cliente_id):
-    cliente = Cliente.query.get_or_404(cliente_id)
-    
-    # Eliminar los QR relacionados
-    for qr in cliente.codigos:
-        # Eliminar archivo de imagen si existe
-        qr_filename = f"{str(qr.numero_correlativo).zfill(4)}.png"
-        qr_path = os.path.join('static/qr_codes', qr_filename)
-        if os.path.exists(qr_path):
-            os.remove(qr_path)
-        db.session.delete(qr)
-    
-    # Eliminar el cliente
-    db.session.delete(cliente)
-    db.session.commit()
-    return redirect(url_for('index'))
-
 
 @app.route('/reporte')
 def reporte():
@@ -189,17 +144,20 @@ def reporte():
                            total_recaudado=total_recaudado,
                            total_pendiente=total_pendiente)
 
-# Crear las tablas si no existen (solo al inicio)
-#@app.before_first_request
-#def crear_tablas():
-#    db.create_all()
+@app.route('/eliminar_cliente/<int:cliente_id>', methods=['POST'])
+def eliminar_cliente(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
 
-# Ruta raíz de prueba
-#@app.route('/')
-#def home():
-#    return '¡App Flask conectada a PostgreSQL en Render!'
+    # Eliminar archivos de códigos QR
+    for qr in cliente.codigos:
+        qr_filename = f"{str(qr.numero_correlativo).zfill(4)}.png"
+        qr_path = os.path.join('static/qr_codes', qr_filename)
+        if os.path.exists(qr_path):
+            os.remove(qr_path)
 
-
+    db.session.delete(cliente)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
