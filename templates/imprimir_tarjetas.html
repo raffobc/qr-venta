@@ -80,9 +80,10 @@
             <div class="texto">
             </div>
             <div class="codigo">
-                <img src="{{ url_for('static', filename='qr_codes/' + ("%04d"|format(qr.numero_correlativo)) + '.png') }}" class="qr-img">
-                <p><strong>N° {{ "%04d"|format(qr.numero_correlativo) }}</strong></p>
+               <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ qr.codigo }}&size=200x200" class="qr-img" alt="QR">
+               <p><strong>N° {{ "%04d"|format(qr.numero_correlativo) }}</strong></p>
             </div>
+
         </div>
         {% if loop.index % 6 == 0 %}
             <div class="page-break"></div>
