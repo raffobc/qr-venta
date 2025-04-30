@@ -99,8 +99,7 @@ def ver_estado(qr_id):
 
         if nuevo_estado == 'pagado' and qr.estado == 'sin pagar':
             monto = request.form.get('monto')
-            if monto:
-                qr.monto_pagado = float(monto)
+            qr.monto_pagado = float(monto) if monto else 20.0  # Asignación automática
             qr.estado = 'pagado'
 
         elif nuevo_estado == 'entregado' and qr.estado == 'pagado':
