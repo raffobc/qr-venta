@@ -25,14 +25,14 @@
             </p>
 
             {% if qr.monto_pagado %}
-                <p><strong>Monto pagado:</strong> S/ {{ "%.2f"|format(qr.monto_pagado) }}</p>
+                <p><strong>Monto pagado:</strong> S/ {{ "%.2f"|format(qr.monto_pagado or 0) }}</p>
             {% endif %}
         </div>
     </div>
 
     {% if qr.estado == 'entregado' %}
         <div class="alert alert-success">✅ Este código ya fue entregado. No se puede modificar.</div>
-        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver</a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver al inicio</a>
     {% else %}
         <form method="POST" class="mb-3">
             <div class="mb-3">
@@ -50,11 +50,12 @@
 
             <div class="mb-3" id="montoField" style="display: none;">
                 <label for="monto" class="form-label">Monto Pagado (S/):</label>
-                <input type="number" class="form-control" name="monto" id="monto" step="0.01" value="{{ qr.monto_pagado or '' }}">
+                <input type="number" class="form-control" name="monto" id="monto" step="0.01" 
+                       value="{{ qr.monto_pagado if qr.monto_pagado is not none else 20 }}">
             </div>
 
             <button type="submit" class="btn btn-success">💾 Guardar</button>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver</a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver al inicio</a>
         </form>
     {% endif %}
 </div>
@@ -62,7 +63,17 @@
 <script>
 function toggleMonto() {
     const estado = document.getElementById('estado').value;
-    document.getElementById('montoField').style.display = (estado === 'pagado') ? 'block' : 'none';
+    const montoField = document.getElementById('montoField');
+    const montoInput = document.getElementById('monto');
+
+    if (estado === 'pagado') {
+        montoField.style.display = 'block';
+        if (!montoInput.value || montoInput.value === "0") {
+            montoInput.value = "20.00";
+        }
+    } else {
+        montoField.style.display = 'none';
+    }
 }
 window.onload = toggleMonto;
 </script>
