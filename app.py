@@ -142,6 +142,25 @@ def imprimir_cliente(cliente_id):
     return render_template('imprimir_tarjetas.html', cliente=cliente)
 
 
+@app.route('/eliminar_cliente/<int:cliente_id>', methods=['POST'])
+def eliminar_cliente(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    
+    # Eliminar los QR relacionados
+    for qr in cliente.codigos:
+        # Eliminar archivo de imagen si existe
+        qr_filename = f"{str(qr.numero_correlativo).zfill(4)}.png"
+        qr_path = os.path.join('static/qr_codes', qr_filename)
+        if os.path.exists(qr_path):
+            os.remove(qr_path)
+        db.session.delete(qr)
+    
+    # Eliminar el cliente
+    db.session.delete(cliente)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
 @app.route('/reporte')
 def reporte():
     clientes = Cliente.query.all()
