@@ -171,9 +171,9 @@ def reporte():
                            total_pendiente=total_pendiente)
 
 # Crear las tablas si no existen (solo al inicio)
-@app.before_first_request
-def crear_tablas():
-    db.create_all()
+#@app.before_first_request
+#def crear_tablas():
+#    db.create_all()
 
 # Ruta raíz de prueba
 #@app.route('/')
