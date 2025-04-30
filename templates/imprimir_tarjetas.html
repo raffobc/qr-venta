@@ -29,24 +29,12 @@
             display: flex;
             justify-content: space-between;
             background-image: url("{{ url_for('static', filename='imagenes/fondo_tarjeta.jpg') }}");
-            background-size: cover;
+            background-size: 100% 100%; /* <-- Aquí el cambio clave */
             background-position: center;
+            background-repeat: no-repeat; /* <-- Evita que se repita */
             position: relative;
             color: black;
         }
-
-        .tarjeta::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255, 255, 255, 0.8); /* Ajusta la opacidad según necesites */
-            z-index: 0;
-        }
-
-    .tarjeta > * {
-        position: relative;
-        z-index: 1;
-    }
 
         .texto {
             width: 65%;
@@ -55,15 +43,24 @@
         }
 
         .codigo {
-            width: 35%;
-            text-align: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 5px;
+            text-align: left;
         }
-
+		
         .qr-img {
-            width: 100%;
-            height: auto;
-            max-height: 150px;
-            object-fit: contain;
+            width: 75px;
+            height: 75px;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 2px;
+        }
+		
+        .codigo p {
+            margin: 0;
+            font-size: 20px;
         }
 
         .container {
@@ -81,13 +78,6 @@
     {% for qr in cliente.codigos %}
         <div class="tarjeta">
             <div class="texto">
-                <p><strong>GRAN POLLADA</strong></p>
-                <p>Organiza: Colaboradores de Extinción de Dominio</p>
-                <p>A realizarse el día viernes 28 de mayo</p>
-                <p>Lugar: Comedor Natasha</p>
-                <p><strong>Colaboración: 20 Soles</strong></p>
-                <p>Agradecemos su colaboración</p>
-                <p>Tarjeta aceptada - Tarjeta pagada</p>
             </div>
             <div class="codigo">
                 <img src="{{ url_for('static', filename='qr_codes/' + ("%04d"|format(qr.numero_correlativo)) + '.png') }}" class="qr-img">
