@@ -34,7 +34,6 @@
 
     {% if qr.estado == 'entregado' %}
         <div class="alert alert-success">✅ Este código ya fue entregado. No se puede modificar.</div>
-        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver al inicio</a>
     {% else %}
         <form method="POST" class="mb-3">
             <div class="mb-3">
@@ -57,14 +56,23 @@
             </div>
 
             <button type="submit" class="btn btn-success">💾 Guardar</button>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver al inicio</a>
         </form>
     {% endif %}
+
+    <!-- Botones destacados -->
+    <div class="d-flex gap-3 mt-3">
+        <a href="{{ url_for('escanear') }}" class="btn btn-primary btn-lg">
+            🔄 Escanear otro
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark btn-lg">
+            ⬅ Volver al inicio
+        </a>
+    </div>
 </div>
 
 <script>
 function toggleMonto() {
-    const estado = document.getElementById('estado').value;
+    const estado = document.getElementById('estado')?.value;
     const montoField = document.getElementById('montoField');
     const montoInput = document.getElementById('monto');
 
