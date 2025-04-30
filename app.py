@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import uuid
-import qrcode
 import os
 
 app = Flask(__name__)
 
-# Configuración de la base de datos usando la variable de entorno
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializa SQLAlchemy
 db = SQLAlchemy(app)
 
 class Cliente(db.Model):
@@ -60,12 +57,6 @@ def asignar_qr(cliente_id):
                 numero_correlativo=siguiente_numero
             )
             db.session.add(nuevo_qr)
-
- #           qr = qrcode.make(nuevo_codigo)
- #           qr_filename = f"{str(siguiente_numero).zfill(4)}.png"
- #           qr_path = os.path.join('static/qr_codes', qr_filename)
- #           qr.save(qr_path)
-
             siguiente_numero += 1
         db.session.commit()
         return redirect(url_for('ver_cliente', cliente_id=cliente.id))
@@ -99,7 +90,7 @@ def ver_estado(qr_id):
 
         if nuevo_estado == 'pagado' and qr.estado == 'sin pagar':
             monto = request.form.get('monto')
-            qr.monto_pagado = float(monto) if monto else 20.0  # Asignación automática
+            qr.monto_pagado = float(monto) if monto else 20.0
             qr.estado = 'pagado'
 
         elif nuevo_estado == 'entregado' and qr.estado == 'pagado':
@@ -124,14 +115,19 @@ def reporte():
     PRECIO_POR_QR = 20.0
     for cliente in clientes:
         codigos = cliente.codigos
-        pagados = [c for c in codigos if c.estado == 'pagado']
-        sin_pagar = [c for c in codigos if c.estado == 'sin pagar']
+        pagados = [c for c in codigos if c.monto_pagado and c.monto_pagado > 0]
+        sin_pagar = [c for c in codigos if not c.monto_pagado]
+        entregados = [c for c in codigos if c.estado == 'entregado']
+        pagados_y_entregados = [c for c in entregados if c.monto_pagado and c.monto_pagado > 0]
+
         monto_pagado = sum(c.monto_pagado or 0 for c in pagados)
         monto_pendiente = len(sin_pagar) * PRECIO_POR_QR
         reporte_clientes.append({
             'nombre': cliente.nombre,
             'total_qr': len(codigos),
             'cantidad_pagados': len(pagados),
+            'cantidad_entregados': len(entregados),
+            'pagados_y_entregados': len(pagados_y_entregados),
             'cantidad_sin_pagar': len(sin_pagar),
             'monto_pagado': monto_pagado,
             'monto_pendiente': monto_pendiente,
@@ -146,8 +142,6 @@ def reporte():
 @app.route('/eliminar_cliente/<int:cliente_id>', methods=['POST'])
 def eliminar_cliente(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
-
-    # Eliminar archivos de códigos QR
     for qr in cliente.codigos:
         qr_filename = f"{str(qr.numero_correlativo).zfill(4)}.png"
         qr_path = os.path.join('static/qr_codes', qr_filename)
