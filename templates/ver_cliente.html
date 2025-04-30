@@ -1,12 +1,12 @@
 <h1>QR de {{ cliente.nombre }}</h1>
 <ul>
-    {% for qr in cliente.codigos %}
-    <li>
-        <img src="{{ url_for('static', filename='qr_codes/' + ("%04d"|format(qr.numero_correlativo)) + '.png') }}" width="100"><br>
-        N° {{ "%04d"|format(qr.numero_correlativo) }} - Estado: {{ qr.estado }}<br>
-        Código: {{ qr.codigo }}
-        <a href="{{ url_for('ver_estado', qr_id=qr.id) }}">Ver/Editar</a>
-    </li>
-    {% endfor %}
+{% for codigo in cliente.codigos %}
+    <div class="col-md-3 text-center mb-4">
+        <p><strong>N° {{ "%04d"|format(codigo.numero_correlativo) }}</strong></p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ codigo.codigo }}&size=200x200" alt="QR">
+        <p>{{ codigo.estado|capitalize }}</p>
+    </div>
+{% endfor %}
+
 </ul>
 <a href="{{ url_for('index') }}">Volver</a>
