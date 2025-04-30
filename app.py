@@ -176,9 +176,9 @@ def crear_tablas():
     db.create_all()
 
 # Ruta raíz de prueba
-@app.route('/')
-def home():
-    return '¡App Flask conectada a PostgreSQL en Render!'
+#@app.route('/')
+#def home():
+#    return '¡App Flask conectada a PostgreSQL en Render!'
 
 
 
