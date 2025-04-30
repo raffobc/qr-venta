@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,6 +18,8 @@
             <p><strong>Estado actual:</strong> 
                 {% if qr.estado == 'pagado' %}
                     <span class="badge bg-success">Pagado</span>
+                {% elif qr.estado == 'entregado' %}
+                    <span class="badge bg-primary">Entregado</span>
                 {% else %}
                     <span class="badge bg-warning text-dark">Sin pagar</span>
                 {% endif %}
@@ -28,23 +31,33 @@
         </div>
     </div>
 
-    <form method="POST" class="mb-3">
-        <div class="mb-3">
-            <label for="estado" class="form-label">Cambiar estado:</label>
-            <select name="estado" id="estado" class="form-select" onchange="toggleMonto()">
-                <option value="sin pagar" {% if qr.estado == 'sin pagar' %}selected{% endif %}>Sin pagar</option>
-                <option value="pagado" {% if qr.estado == 'pagado' %}selected{% endif %}>Pagado</option>
-            </select>
-        </div>
-
-        <div class="mb-3" id="montoField" style="display: none;">
-            <label for="monto" class="form-label">Monto Pagado (S/):</label>
-            <input type="number" class="form-control" name="monto" id="monto" step="0.01" value="{{ qr.monto_pagado or '' }}">
-        </div>
-
-        <button type="submit" class="btn btn-success">💾 Guardar</button>
+    {% if qr.estado == 'entregado' %}
+        <div class="alert alert-success">✅ Este código ya fue entregado. No se puede modificar.</div>
         <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver</a>
-    </form>
+    {% else %}
+        <form method="POST" class="mb-3">
+            <div class="mb-3">
+                <label for="estado" class="form-label">Cambiar estado:</label>
+                <select name="estado" id="estado" class="form-select" onchange="toggleMonto()">
+                    {% if qr.estado == 'sin pagar' %}
+                        <option value="sin pagar" selected>Sin pagar</option>
+                        <option value="pagado">Pagado</option>
+                    {% elif qr.estado == 'pagado' %}
+                        <option value="pagado" selected>Pagado</option>
+                        <option value="entregado">Entregado</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="mb-3" id="montoField" style="display: none;">
+                <label for="monto" class="form-label">Monto Pagado (S/):</label>
+                <input type="number" class="form-control" name="monto" id="monto" step="0.01" value="{{ qr.monto_pagado or '' }}">
+            </div>
+
+            <button type="submit" class="btn btn-success">💾 Guardar</button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-dark">⬅ Volver</a>
+        </form>
+    {% endif %}
 </div>
 
 <script>
