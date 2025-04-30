@@ -4,3 +4,4 @@ PyMySQL
 qrcode
 WeasyPrint
 gunicorn
+psycopg2-binary
