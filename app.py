@@ -61,10 +61,10 @@ def asignar_qr(cliente_id):
             )
             db.session.add(nuevo_qr)
 
-            qr = qrcode.make(nuevo_codigo)
-            qr_filename = f"{str(siguiente_numero).zfill(4)}.png"
-            qr_path = os.path.join('static/qr_codes', qr_filename)
-            qr.save(qr_path)
+ #           qr = qrcode.make(nuevo_codigo)
+ #           qr_filename = f"{str(siguiente_numero).zfill(4)}.png"
+ #           qr_path = os.path.join('static/qr_codes', qr_filename)
+ #           qr.save(qr_path)
 
             siguiente_numero += 1
         db.session.commit()
