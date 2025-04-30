@@ -15,10 +15,12 @@
             <p><strong>N°:</strong> {{ "%04d"|format(qr.numero_correlativo) }}</p>
             <p><strong>Código:</strong> {{ qr.codigo }}</p>
             <p><strong>Estado actual:</strong> 
-                {% if qr.estado == 'pagado' %}
-                    <span class="badge bg-success">Pagado</span>
+                {% if qr.estado == 'entregado' and qr.monto_pagado %}
+                    <span class="badge bg-primary">Entregado (Pagado)</span>
                 {% elif qr.estado == 'entregado' %}
                     <span class="badge bg-primary">Entregado</span>
+                {% elif qr.estado == 'pagado' %}
+                    <span class="badge bg-success">Pagado</span>
                 {% else %}
                     <span class="badge bg-warning text-dark">Sin pagar</span>
                 {% endif %}

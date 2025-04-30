@@ -6,6 +6,8 @@
             <th>Cliente</th>
             <th>Total QR Generados</th>
             <th>QR Pagados</th>
+            <th>QR Entregados</th>
+            <th>Pagados y Entregados</th>
             <th>Monto Pagado (S/)</th>
             <th>QR Sin Pagar</th>
             <th>Monto Pendiente (S/)</th>
@@ -17,6 +19,8 @@
             <td>{{ cliente.nombre }}</td>
             <td>{{ cliente.total_qr }}</td>
             <td>{{ cliente.cantidad_pagados }}</td>
+            <td>{{ cliente.cantidad_entregados }}</td>
+            <td>{{ cliente.pagados_y_entregados }}</td>
             <td>S/ {{ "%.2f"|format(cliente.monto_pagado) }}</td>
             <td>{{ cliente.cantidad_sin_pagar }}</td>
             <td>S/ {{ "%.2f"|format(cliente.monto_pendiente) }}</td>
