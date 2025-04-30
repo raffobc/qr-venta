@@ -1,0 +1,6 @@
+Flask
+Flask_SQLAlchemy
+PyMySQL
+qrcode
+WeasyPrint
+gunicorn
