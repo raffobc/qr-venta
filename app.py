@@ -5,9 +5,14 @@ import qrcode
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///basededatos.db'
+
+# Configuración de la base de datos usando la variable de entorno
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+
+# Soluciona advertencia de SQLAlchemy si usas versiones recientes
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Inicializa SQLAlchemy
 db = SQLAlchemy(app)
 
 class Cliente(db.Model):
@@ -131,6 +136,18 @@ def reporte():
                            reporte_clientes=reporte_clientes,
                            total_recaudado=total_recaudado,
                            total_pendiente=total_pendiente)
+
+# Crear las tablas si no existen (solo al inicio)
+@app.before_first_request
+def crear_tablas():
+    db.create_all()
+
+# Ruta raíz de prueba
+@app.route('/')
+def home():
+    return '¡App Flask conectada a PostgreSQL en Render!'
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
