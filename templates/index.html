@@ -34,6 +34,9 @@
                     <a href="{{ url_for('ver_cliente', cliente_id=cliente.id) }}" class="btn btn-outline-info btn-sm">Ver</a>
                     <a href="{{ url_for('asignar_qr', cliente_id=cliente.id) }}" class="btn btn-outline-primary btn-sm">Asignar QR</a>
                     <a href="{{ url_for('imprimir_cliente', cliente_id=cliente.id) }}" class="btn btn-outline-dark btn-sm" target="_blank">🖨 Imprimir Tarjetas</a>
+                    <form action="{{ url_for('eliminar_cliente', cliente_id=cliente.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar este cliente y sus QR?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">🗑 Eliminar</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
