@@ -93,15 +93,27 @@ def escanear():
 @app.route('/ver_estado/<int:qr_id>', methods=['GET', 'POST'])
 def ver_estado(qr_id):
     qr = CodigoQR.query.get_or_404(qr_id)
+
     if request.method == 'POST':
-        qr.estado = request.form['estado']
-        if qr.estado == 'pagado':
+        if qr.estado == 'entregado':
+            return "❌ Este código ya fue entregado. No se puede modificar.", 403
+
+        nuevo_estado = request.form.get('estado')
+
+        if nuevo_estado == 'pagado' and qr.estado == 'sin pagar':
             monto = request.form.get('monto')
             if monto:
                 qr.monto_pagado = float(monto)
+            qr.estado = 'pagado'
+
+        elif nuevo_estado == 'entregado' and qr.estado == 'pagado':
+            qr.estado = 'entregado'
+
         db.session.commit()
         return redirect(url_for('ver_estado', qr_id=qr.id))
+
     return render_template('ver_estado.html', qr=qr)
+
 
 @app.route('/imprimir_cliente/<int:cliente_id>')
 def imprimir_cliente(cliente_id):
